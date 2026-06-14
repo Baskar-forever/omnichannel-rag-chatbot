@@ -6,13 +6,3 @@ client = QdrantClient(
     host="localhost",
     port=6333
 )
-
-client.recreate_collection(
-    collection_name="zenfuture_knowledge",
-    vectors_config=VectorParams(
-        size=384,
-        distance=Distance.COSINE
-    )
-)
-
-print("Collection created")
