@@ -29,8 +29,8 @@ class IngestionService:
 
         self.chunker = (
             Chunker(
-                chunk_size=800,
-                chunk_overlap=150
+                chunk_size=500,
+                chunk_overlap=85
             )
         )
 
