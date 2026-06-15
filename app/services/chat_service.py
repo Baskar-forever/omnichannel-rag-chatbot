@@ -1,3 +1,10 @@
+from app.utils.validators import (
+    is_valid_name,
+    is_valid_email,
+    is_valid_phone
+)
+
+
 class ChatService:
 
     def __init__(
@@ -56,8 +63,7 @@ class ChatService:
     ):
 
         session = (
-            self.session_repository
-            .get_by_id(
+            self.session_repository.get_by_id(
                 db,
                 session_id
             )
@@ -76,11 +82,33 @@ class ChatService:
             content=message
         )
 
-        pending_data = (
+        pending_data = dict(
             session.pending_data or {}
         )
 
+        # ==================================================
+        # ASK_NAME
+        # ==================================================
+
         if session.state == "ASK_NAME":
+
+            if not is_valid_name(message):
+
+                reply = (
+                    "Please enter a valid name."
+                )
+
+                self.message_repository.create(
+                    db=db,
+                    session_id=session.id,
+                    role="assistant",
+                    content=reply
+                )
+
+                return {
+                    "reply": reply,
+                    "state": "ASK_NAME"
+                }
 
             pending_data["name"] = message
 
@@ -112,11 +140,29 @@ class ChatService:
                 "state": "ASK_EMAIL"
             }
 
+        # ==================================================
+        # ASK_EMAIL
+        # ==================================================
+
         if session.state == "ASK_EMAIL":
 
-            pending_data = dict(
-                session.pending_data or {}
-            )
+            if not is_valid_email(message):
+
+                reply = (
+                    "Please enter a valid email address."
+                )
+
+                self.message_repository.create(
+                    db=db,
+                    session_id=session.id,
+                    role="assistant",
+                    content=reply
+                )
+
+                return {
+                    "reply": reply,
+                    "state": "ASK_EMAIL"
+                }
 
             pending_data["email"] = message
 
@@ -148,9 +194,37 @@ class ChatService:
                 "state": "ASK_PHONE"
             }
 
+        # ==================================================
+        # ASK_PHONE
+        # ==================================================
+
         if session.state == "ASK_PHONE":
 
+            if not is_valid_phone(message):
+
+                reply = (
+                    "Please enter a valid phone number."
+                )
+
+                self.message_repository.create(
+                    db=db,
+                    session_id=session.id,
+                    role="assistant",
+                    content=reply
+                )
+
+                return {
+                    "reply": reply,
+                    "state": "ASK_PHONE"
+                }
+
             pending_data["phone"] = message
+
+            self.session_repository.update_pending_data(
+                db,
+                session,
+                pending_data
+            )
 
             lead = (
                 self.lead_repository.create(
@@ -197,6 +271,10 @@ class ChatService:
                 "state": "READY"
             }
 
+        # ==================================================
+        # READY
+        # ==================================================
+
         if session.state == "READY":
 
             rag_response = (
@@ -219,9 +297,7 @@ class ChatService:
             return {
                 "reply": answer,
                 "state": "READY",
-                "sources": (
-                    rag_response["sources"]
-                )
+                "sources": rag_response["sources"]
             }
 
         raise ValueError(
