@@ -1,29 +1,37 @@
+from crawler.website_crawler import (
+    WebsiteCrawler
+)
+
 from crawler.content_extractor import (
-ContentExtractor
+    ContentExtractor
 )
 
 from app.services.ingestion_service import (
-IngestionService
+    IngestionService
 )
 
 from app.rag.qdrant_service import (
-QdrantService
+    QdrantService
 )
 
 from app.providers.embeddings.sentence_transformer_provider import (
-SentenceTransformerProvider
+    SentenceTransformerProvider
 )
 
-COLLECTION_NAME = (
-"zenfuture_knowledge"
-)
 
 def main():
 
-    extractor = ContentExtractor()
+    crawler = WebsiteCrawler()
+
+    urls = crawler.crawl("https://zenfuture.in")
+
+    print(
+        f"Found {len(urls)} URLs"
+    )
 
     embedding_provider = (
         SentenceTransformerProvider(
+            model_name=
             "BAAI/bge-small-en-v1.5"
         )
     )
@@ -31,7 +39,7 @@ def main():
     qdrant_service = (
         QdrantService(
             collection_name=
-                COLLECTION_NAME
+            "zenfuture_knowledge"
         )
     )
 
@@ -41,24 +49,22 @@ def main():
 
     ingestion_service = (
         IngestionService(
-            extractor=extractor,
+            extractor=
+                ContentExtractor(),
+
             embedding_provider=
                 embedding_provider,
+
             qdrant_service=
                 qdrant_service
         )
     )
 
     result = (
-        ingestion_service.ingest_url(
-            "https://zenfuture.in/about.php"
+        ingestion_service.ingest_urls(
+            urls
         )
     )
-
-    print("\n")
-    print("=" * 50)
-    print("INGESTION COMPLETE")
-    print("=" * 50)
 
     print(result)
 
