@@ -1,7 +1,9 @@
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import JSON
 
 from sqlalchemy.sql import func
 
@@ -17,6 +19,18 @@ class ChatSession(Base):
         Integer,
         ForeignKey("leads.id"),
         nullable=True
+    )
+
+    state = Column(
+        String(50),
+        nullable=False,
+        default="ASK_NAME"
+    )
+
+    pending_data = Column(
+        JSON,
+        nullable=True,
+        default=dict
     )
 
     created_at = Column(
