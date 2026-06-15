@@ -9,3 +9,6 @@ requests
 python-dotenv
 ollama
 qdrant-client
+langchain-text-splitters
+langchain-community
+beautifulsoup4
