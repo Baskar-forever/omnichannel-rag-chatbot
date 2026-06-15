@@ -1,6 +1,8 @@
-import ollama
+from ollama import chat
 
-from app.providers.llm.base import LLMProvider
+from app.providers.llm.base import (
+    LLMProvider
+)
 
 
 class OllamaProvider(
@@ -9,17 +11,17 @@ class OllamaProvider(
 
     def __init__(
         self,
-        model_name: str
+        model="llama3.2"
     ):
-        self.model_name = model_name
+        self.model = model
 
     def generate(
         self,
         prompt: str
     ) -> str:
 
-        response = ollama.chat(
-            model=self.model_name,
+        response = chat(
+            model=self.model,
             messages=[
                 {
                     "role": "user",
@@ -29,3 +31,23 @@ class OllamaProvider(
         )
 
         return response["message"]["content"]
+
+    def stream_generate(
+        self,
+        prompt: str
+    ):
+
+        stream = chat(
+            model=self.model,
+            stream=True,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        for chunk in stream:
+
+            yield chunk["message"]["content"]
