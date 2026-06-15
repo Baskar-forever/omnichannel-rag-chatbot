@@ -51,10 +51,10 @@ def main():
 
     questions = [
         "How many projects has ZenFuture delivered?",
-        "What cloud solutions do you provide?",
-        "Do you provide CRM software?",
-        "What is ZenFuture's mission?",
-        "What banking solutions do you offer?"
+        # "What cloud solutions do you provide?",
+        # "Do you provide CRM software?",
+        # "What is ZenFuture's mission?",
+        # "What banking solutions do you offer?"
     ]
 
     output_file = "documents/rag_test_results.txt"

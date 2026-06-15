@@ -1,6 +1,15 @@
 from pydantic import BaseModel
 
 
+class SourceResponse(
+    BaseModel
+):
+
+    title: str
+
+    url: str
+
+
 class ChatRequest(
     BaseModel
 ):
@@ -17,3 +26,5 @@ class ChatResponse(
     reply: str
 
     state: str
+
+    sources: list[SourceResponse] = []

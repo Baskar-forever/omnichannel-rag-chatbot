@@ -294,10 +294,40 @@ class ChatService:
                 content=answer
             )
 
+            sources = []
+
+            seen_urls = set()
+
+            for chunk in rag_response["sources"]:
+
+                url = chunk.get(
+                    "url"
+                )
+
+                if not url:
+                    continue
+
+                if url in seen_urls:
+                    continue
+
+                seen_urls.add(
+                    url
+                )
+
+                sources.append(
+                    {
+                        "title": chunk.get(
+                            "title",
+                            ""
+                        ),
+                        "url": url
+                    }
+                )
+
             return {
                 "reply": answer,
                 "state": "READY",
-                "sources": rag_response["sources"]
+                "sources": sources
             }
 
         raise ValueError(

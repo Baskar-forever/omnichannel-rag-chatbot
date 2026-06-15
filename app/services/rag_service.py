@@ -1,14 +1,26 @@
-from app.prompts.rag_prompt import build_rag_prompt
+from app.prompts.rag_prompt import (
+    build_rag_prompt
+)
 
 
 class RAGService:
 
-    def __init__(self, retriever, llm_provider):
+    def __init__(
+        self,
+        retriever,
+        llm_provider
+    ):
 
         self.retriever = retriever
-        self.llm_provider = llm_provider
 
-    def _build_context(self,chunks: list[dict]) -> str:
+        self.llm_provider = (
+            llm_provider
+        )
+
+    def _build_context(
+        self,
+        chunks: list[dict]
+    ) -> str:
 
         context_parts = []
 
@@ -22,7 +34,11 @@ class RAGService:
             context_parts
         )
 
-    def ask(self, question: str, top_k: int = 5) -> dict:
+    def retrieve_context(
+        self,
+        question: str,
+        top_k: int = 5
+    ) -> dict:
 
         chunks = (
             self.retriever.retrieve(
@@ -37,9 +53,27 @@ class RAGService:
             )
         )
 
+        return {
+            "context": context,
+            "sources": chunks
+        }
+
+    def ask(
+        self,
+        question: str,
+        top_k: int = 5
+    ) -> dict:
+
+        retrieval = (
+            self.retrieve_context(
+                question=question,
+                top_k=top_k
+            )
+        )
+
         prompt = (
             build_rag_prompt(
-                context=context,
+                context=retrieval["context"],
                 question=question
             )
         )
@@ -52,28 +86,26 @@ class RAGService:
 
         return {
             "answer": answer,
-            "sources": chunks
+            "sources":
+                retrieval["sources"]
         }
 
-    def stream_ask(self,question: str,top_k: int = 5
+    def stream_ask(
+        self,
+        question: str,
+        top_k: int = 5
     ):
 
-        chunks = (
-            self.retriever.retrieve(
+        retrieval = (
+            self.retrieve_context(
                 question=question,
                 top_k=top_k
             )
         )
 
-        context = (
-            self._build_context(
-                chunks
-            )
-        )
-
         prompt = (
             build_rag_prompt(
-                context=context,
+                context=retrieval["context"],
                 question=question
             )
         )
