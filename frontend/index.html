@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ZenFuture AI Assistant
+    </title>
+
+    <link rel="icon" type="image/webp" href="/zenfuture-technologies-logo.webp">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="stylesheet"
+        href="./css/chat.css"
+    >
+
+</head>
+
+<body
+    class="
+        bg-slate-200
+        min-h-screen
+    "
+>
+
+    <!-- Floating Button -->
+
+    <button
+        id="chat-toggle"
+        class="
+            fixed
+            bottom-6
+            right-6
+            h-16
+            w-16
+            rounded-full
+            bg-blue-600
+            text-white
+            shadow-xl
+            hover:bg-blue-700
+            transition
+            text-2xl
+            z-50
+        "
+    >
+        💬
+    </button>
+
+    <!-- Chat Widget -->
+
+    <div
+        id="chat-widget"
+        class="
+            hidden
+            fixed
+            bottom-6
+            right-6
+            w-[380px]
+            h-[650px]
+            bg-white
+            rounded-2xl
+            shadow-2xl
+            overflow-hidden
+            flex
+            flex-col
+            z-50
+        "
+    >
+
+        <!-- Header -->
+
+        <div
+            class="
+                bg-blue-600
+                text-white
+                px-4
+                py-4
+                flex
+                items-center
+                justify-between
+            "
+        >
+
+            <div>
+
+                <h2
+                    class="
+                        font-semibold
+                        text-lg
+                    "
+                >
+                    ZenFuture Technologies
+                </h2>
+
+                <p
+                    class="
+                        text-sm
+                        opacity-90
+                    "
+                >
+                    AI Assistant
+                </p>
+
+            </div>
+
+            <div class="flex gap-2">
+
+    <button
+        id="clear-chat"
+        class="text-lg"
+    >
+        🗑️
+    </button>
+
+    <button
+        id="chat-close"
+        class="text-xl"
+    >
+        ✕
+    </button>
+
+</div>
+
+        </div>
+
+        <!-- Messages -->
+
+        <div
+            id="messages"
+            class="
+                flex-1
+                overflow-y-auto
+                bg-slate-100
+                p-4
+                space-y-4
+            "
+        >
+        </div>
+
+        <!-- Input -->
+
+        <div
+            class="
+                border-t
+                bg-white
+                p-3
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    gap-2
+                "
+            >
+
+                <input
+                    id="message-input"
+                    type="text"
+                    placeholder="Type your message..."
+                    class="
+                        flex-1
+                        border
+                        rounded-lg
+                        px-4
+                        py-2
+                        outline-none
+                        focus:ring-2
+                        focus:ring-blue-500
+                    "
+                >
+
+                <button
+                    id="send-button"
+                    class="
+                        bg-blue-600
+                        text-white
+                        px-5
+                        rounded-lg
+                        hover:bg-blue-700
+                    "
+                >
+                    ➤
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script
+        src="./js/chat.js"
+    ></script>
+
+</body>
+
+</html>

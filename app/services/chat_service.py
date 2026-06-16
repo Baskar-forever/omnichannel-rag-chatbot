@@ -333,3 +333,54 @@ class ChatService:
         raise ValueError(
             f"Unknown state: {session.state}"
         )
+    
+    def get_history(
+        self,
+        db,
+        session_id: int
+    ):
+
+        messages = (
+            self.message_repository
+            .get_by_session(
+                db,
+                session_id
+            )
+        )
+
+        return [
+            {
+                "role": message.role,
+                "content": message.content
+            }
+            for message in messages
+        ]
+    
+    def clear_history(
+        self,
+        db,
+        session_id: int
+    ):
+
+        session = (
+            self.session_repository
+            .get_by_id(
+                db,
+                session_id
+            )
+        )
+
+        if not session:
+
+            raise ValueError(
+                "Invalid session"
+            )
+
+        self.message_repository.delete_by_session(
+            db,
+            session_id
+        )
+
+        return {
+            "success": True
+        }

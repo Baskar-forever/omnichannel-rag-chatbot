@@ -91,3 +91,43 @@ def stream_chat(
         ),
         media_type="text/plain"
     )
+
+@router.get(
+    "/session/{session_id}/messages"
+)
+def get_messages(
+        session_id: int,
+        db: Session = Depends(
+            get_db
+        ),
+        chat_service = Depends(
+            get_chat_service
+        )
+    ):
+
+        return (
+            chat_service.get_history(
+                db,
+                session_id
+            )
+        )
+
+@router.delete(
+    "/session/{session_id}/messages"
+)
+def clear_history(
+    session_id: int,
+    db: Session = Depends(
+        get_db
+    ),
+    chat_service = Depends(
+        get_chat_service
+    )
+):
+
+    return (
+        chat_service.clear_history(
+            db,
+            session_id
+        )
+    )

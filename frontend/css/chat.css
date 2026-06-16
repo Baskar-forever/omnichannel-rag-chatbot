@@ -1,0 +1,209 @@
+body {
+
+    font-family:
+        Inter,
+        sans-serif;
+}
+
+/* =====================================
+   USER MESSAGE
+===================================== */
+
+.user-message {
+
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+.user-bubble {
+
+    max-width: 80%;
+
+    background: #2563eb;
+
+    color: white;
+
+    padding: 12px 14px;
+
+    border-radius: 16px;
+
+    word-wrap: break-word;
+}
+
+/* =====================================
+   BOT MESSAGE
+===================================== */
+
+.bot-message {
+
+    display: flex;
+
+    gap: 10px;
+
+    align-items: flex-start;
+}
+
+.bot-avatar {
+
+    width: 34px;
+
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 16px;
+}
+
+.bot-bubble {
+
+    max-width: 80%;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+
+    padding: 12px 14px;
+
+    border-radius: 16px;
+
+    color: #1e293b;
+
+    word-wrap: break-word;
+
+    box-shadow:
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.05
+        );
+}
+
+/* =====================================
+   SOURCES
+===================================== */
+
+.sources-container {
+
+    margin-top: 10px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.source-card {
+
+    display: block;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    padding: 10px;
+
+    text-decoration: none;
+
+    color: #1e293b;
+
+    transition: all 0.2s ease;
+}
+
+.source-card:hover {
+
+    background: #eff6ff;
+
+    border-color: #2563eb;
+}
+
+/* =====================================
+   TYPING INDICATOR
+===================================== */
+
+.typing-indicator {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.typing-dot {
+
+    width: 8px;
+
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #94a3b8;
+
+    animation:
+        bounce 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+
+        transform:
+            translateY(0);
+    }
+
+    40% {
+
+        transform:
+            translateY(-5px);
+    }
+}
+
+/* =====================================
+   SCROLLBAR
+===================================== */
+
+#messages::-webkit-scrollbar {
+
+    width: 6px;
+}
+
+#messages::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+}

@@ -41,3 +41,19 @@ class MessageRepository:
             )
             .all()
         )
+    
+    def delete_by_session(
+        self,
+        db,
+        session_id: int
+    ):
+
+        (
+            db.query(Message)
+            .filter(
+                Message.session_id == session_id
+            )
+            .delete()
+        )
+
+        db.commit()
