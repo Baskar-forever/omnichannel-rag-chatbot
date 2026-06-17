@@ -37,7 +37,7 @@ class RAGService:
     def retrieve_context(
         self,
         question: str,
-        top_k: int = 5
+        top_k: int = 10
     ) -> dict:
 
         chunks = (
@@ -61,7 +61,7 @@ class RAGService:
     def ask(
         self,
         question: str,
-        top_k: int = 5
+        top_k: int = 10
     ) -> dict:
 
         retrieval = (
@@ -93,7 +93,7 @@ class RAGService:
     def stream_ask(
         self,
         question: str,
-        top_k: int = 5
+        top_k: int = 10
     ):
 
         retrieval = (

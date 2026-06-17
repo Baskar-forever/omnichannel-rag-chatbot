@@ -1,5 +1,4 @@
-const API_BASE =
-    "http://127.0.0.1:8000";
+const API_BASE ="http://127.0.0.1:8000";
 
 let sessionId = null;
 
@@ -39,6 +38,9 @@ const clearChat =
         "clear-chat"
     );
 
+
+let currentState = null;
+
 /* =====================================
    SESSION
 ===================================== */
@@ -57,10 +59,12 @@ async function createSession() {
 
         const data =
             await response.json();
+        
+        
 
-        sessionId =
-            data.session_id;
-
+        sessionId = data.session_id;
+        currentState = data.state;
+        
         localStorage.setItem(
             "session_id",
             sessionId
@@ -93,6 +97,120 @@ function loadSession() {
             parseInt(
                 storedSessionId
             );
+    }
+}
+
+async function sendNormalMessage(
+    text
+) {
+
+    const response =
+        await fetch(
+            `${API_BASE}/api/chat`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify(
+                    {
+                        session_id:
+                            sessionId,
+
+                        message:
+                            text
+                    }
+                )
+            }
+        );
+
+    const data =
+        await response.json();
+
+    currentState =
+        data.state;
+
+    addBotMessage(
+        data.reply,
+        data.sources || []
+    );
+}
+
+async function sendStreamMessage(
+    text
+) {
+
+    const response =
+        await fetch(
+            `${API_BASE}/api/chat/stream`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify(
+                    {
+                        session_id:
+                            sessionId,
+
+                        message:
+                            text
+                    }
+                )
+            }
+        );
+
+    const botBubble =
+        createStreamingMessage();
+
+    const reader =
+        response.body.getReader();
+
+    const decoder =
+        new TextDecoder();
+
+    let answer = "";
+
+    let firstChunk = true;
+
+    while (true) {
+
+        const {
+            done,
+            value
+        } = await reader.read();
+
+        if (done) {
+
+            break;
+        }
+
+        const chunk =
+            decoder.decode(
+                value
+            );
+
+        if (
+            firstChunk
+        ) {
+
+            botBubble.innerHTML = "";
+
+            firstChunk = false;
+        }
+
+        answer += chunk;
+
+        botBubble.textContent =
+            answer;
+
+        scrollToBottom();
     }
 }
 
@@ -255,46 +373,24 @@ async function sendMessage() {
 
     input.value = "";
 
-    showTyping();
-
     try {
 
-        const response =
-            await fetch(
-                `${API_BASE}/api/chat`,
-                {
-                    method: "POST",
+        if (
+            currentState === "READY"
+        ) {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify(
-                        {
-                            session_id:
-                                sessionId,
-
-                            message:
-                                text
-                        }
-                    )
-                }
+            await sendStreamMessage(
+                text
             );
+        }
+        else {
 
-        const data =
-            await response.json();
-
-        hideTyping();
-
-        addBotMessage(
-            data.reply,
-            data.sources || []
-        );
+            await sendNormalMessage(
+                text
+            );
+        }
 
     } catch (error) {
-
-        hideTyping();
 
         console.error(
             error
@@ -303,46 +399,6 @@ async function sendMessage() {
         addBotMessage(
             "Something went wrong."
         );
-    }
-}
-
-
-async function loadMessages() {
-
-    if (!sessionId) {
-
-        return;
-    }
-
-    const response =
-        await fetch(
-            `${API_BASE}/api/session/${sessionId}/messages`
-        );
-
-    const data =
-        await response.json();
-
-    messages.innerHTML = "";
-
-    for (
-        const message
-        of data
-    ) {
-
-        if (
-            message.role === "user"
-        ) {
-
-            addUserMessage(
-                message.content
-            );
-        }
-        else {
-
-            addBotMessage(
-                message.content
-            );
-        }
     }
 }
 
@@ -375,6 +431,99 @@ async function clearHistory() {
     );
 
     location.reload();
+}
+async function loadMessages() {
+
+    if (!sessionId) {
+
+        return;
+    }
+
+    try {
+
+        const sessionResponse =
+            await fetch(
+                `${API_BASE}/api/session/${sessionId}`
+            );
+
+        const session =
+            await sessionResponse.json();
+
+        currentState =
+            session.state;
+
+        const messagesResponse =
+            await fetch(
+                `${API_BASE}/api/session/${sessionId}/messages`
+            );
+
+        const data =
+            await messagesResponse.json();
+
+        messages.innerHTML = "";
+
+        for (
+            const message
+            of data
+        ) {
+
+            if (
+                message.role === "user"
+            ) {
+
+                addUserMessage(
+                    message.content
+                );
+            }
+            else {
+
+                addBotMessage(
+                    message.content
+                );
+            }
+        }
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+    }
+}
+
+function createStreamingMessage() {
+
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.className =
+        "bot-message";
+
+    wrapper.innerHTML = `
+        <div class="bot-avatar">
+            🤖
+        </div>
+
+        <div
+            class="bot-bubble"
+        >
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    `;
+
+    messages.appendChild(
+        wrapper
+    );
+
+    scrollToBottom();
+
+    return wrapper.querySelector(
+        ".bot-bubble"
+    );
 }
 
 /* =====================================
@@ -422,6 +571,7 @@ chatToggle.addEventListener(
         if (!sessionId) {
 
             await createSession();
+            
         }
         else {
 

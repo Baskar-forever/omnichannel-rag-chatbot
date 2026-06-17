@@ -25,6 +25,11 @@ def main():
 
     urls = crawler.crawl("https://zenfuture.in")
 
+    urls = [
+        url for url in urls
+        if not url.startswith("https://zenfuture.in/index.php")
+    ]
+
     print(
         f"Found {len(urls)} URLs"
     )

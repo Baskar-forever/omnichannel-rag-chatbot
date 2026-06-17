@@ -11,4 +11,4 @@ ollama
 qdrant-client
 langchain-text-splitters
 langchain-community
-beautifulsoup4
+rank-bm25

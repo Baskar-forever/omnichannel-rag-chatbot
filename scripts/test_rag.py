@@ -50,14 +50,23 @@ def main():
     )
 
     questions = [
+
         "How many projects has ZenFuture delivered?",
-        # "What cloud solutions do you provide?",
-        # "Do you provide CRM software?",
-        # "What is ZenFuture's mission?",
-        # "What banking solutions do you offer?"
+
+        "What cloud solutions do you provide?",
+
+        "Do you provide CRM software?",
+
+        "What is ZenFuture's mission?",
+
+        "What banking solutions do you offer?",
+
+        "What products do you offer?"
     ]
 
-    output_file = "documents/rag_test_results.txt"
+    output_file = (
+        "documents/rag_evaluation.txt"
+    )
 
     with open(
         output_file,
@@ -70,18 +79,103 @@ def main():
             start=1
         ):
 
-            print(f"\n[{index}] {question}")
+            print("\n" + "=" * 100)
+            print(
+                f"QUESTION {index}"
+            )
+            print("=" * 100)
 
-            file.write("=" * 100 + "\n")
-            file.write(f"QUESTION {index}\n")
-            file.write("=" * 100 + "\n")
-            file.write(question + "\n\n")
+            print(question)
+
+            file.write(
+                "=" * 100 + "\n"
+            )
+
+            file.write(
+                f"QUESTION {index}\n"
+            )
+
+            file.write(
+                "=" * 100 + "\n"
+            )
+
+            file.write(
+                question + "\n\n"
+            )
+
+            chunks = (
+                retriever.retrieve(
+                    question=question,
+                    top_k=10
+                )
+            )
+
+            print("\nRETRIEVED CHUNKS")
+            print("-" * 100)
+
+            file.write(
+                "RETRIEVED CHUNKS\n"
+            )
+
+            file.write(
+                "-" * 100 + "\n"
+            )
+
+            for chunk_index, chunk in enumerate(
+                chunks,
+                start=1
+            ):
+
+                print(
+                    f"\nCHUNK {chunk_index}"
+                )
+
+                print(
+                    f"Score: {chunk['score']}"
+                )
+
+                print(
+                    f"URL: {chunk['url']}"
+                )
+
+                print(
+                    chunk["text"]
+                )
+
+                file.write(
+                    f"\nCHUNK {chunk_index}\n"
+                )
+
+                file.write(
+                    f"Score: {chunk['score']}\n"
+                )
+
+                file.write(
+                    f"URL: {chunk['url']}\n"
+                )
+
+                file.write(
+                    chunk["text"] + "\n"
+                )
+
+            print("\nANSWER")
+            print("-" * 100)
+
+            file.write(
+                "\nANSWER\n"
+            )
+
+            file.write(
+                "-" * 100 + "\n"
+            )
 
             answer = ""
 
-            for token in rag_service.stream_ask(
-                question=question,
-                top_k=5
+            for token in (
+                rag_service.stream_ask(
+                    question=question,
+                    top_k=10
+                )
             ):
 
                 print(
@@ -94,13 +188,16 @@ def main():
 
             print("\n")
 
-            file.write("ANSWER\n")
-            file.write("-" * 100 + "\n")
-            file.write(answer)
-            file.write("\n\n")
+            file.write(
+                answer
+            )
+
+            file.write(
+                "\n\n"
+            )
 
     print(
-        f"\nResults saved to: {output_file}"
+        f"\nSaved: {output_file}"
     )
 
 

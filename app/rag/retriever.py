@@ -12,7 +12,7 @@ class Retriever:
     def retrieve(
         self,
         question: str,
-        top_k: int = 5
+        top_k: int = 10
     ):
 
         query_embedding = (
@@ -26,21 +26,33 @@ class Retriever:
             self.qdrant_service.search(
                 query_embedding=
                     query_embedding,
-                limit=top_k
+                limit=top_k * 2
             )
         )
 
         chunks = []
 
+        seen_chunks = set()
+
         for result in results:
+
+            text = (
+                result.payload.get(
+                    "text",
+                    ""
+                ).strip()
+            )
+
+            if text in seen_chunks:
+                continue
+
+            seen_chunks.add(
+                text
+            )
 
             chunks.append(
                 {
-                    "text":
-                        result.payload.get(
-                            "text",
-                            ""
-                        ),
+                    "text": text,
 
                     "url":
                         result.payload.get(
@@ -58,5 +70,8 @@ class Retriever:
                         result.score
                 }
             )
+
+            if len(chunks) >= top_k:
+                break
 
         return chunks

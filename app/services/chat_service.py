@@ -333,7 +333,68 @@ class ChatService:
         raise ValueError(
             f"Unknown state: {session.state}"
         )
-    
+    def stream_message(
+        self,
+        db,
+        session_id: int,
+        message: str
+    ):
+
+        session = (
+            self.session_repository
+            .get_by_id(
+                db,
+                session_id
+            )
+        )
+
+        if not session:
+
+            yield "Invalid session"
+
+            return
+
+        self.message_repository.create(
+            db=db,
+            session_id=session.id,
+            role="user",
+            content=message
+        )
+
+        if session.state != "READY":
+
+            yield (
+                "Streaming is available "
+                "only after lead collection."
+            )
+
+            return
+
+        answer_parts = []
+
+        for token in (
+            self.rag_service
+            .stream_ask(
+                question=message
+            )
+        ):
+
+            answer_parts.append(
+                token
+            )
+
+            yield token
+
+        full_answer = "".join(
+            answer_parts
+        )
+
+        self.message_repository.create(
+            db=db,
+            session_id=session.id,
+            role="assistant",
+            content=full_answer
+        )
     def get_history(
         self,
         db,
