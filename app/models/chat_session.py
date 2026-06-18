@@ -38,3 +38,9 @@ class ChatSession(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
+
+    phone_number = Column(
+    String(20),
+    nullable=True,
+    unique=True
+)

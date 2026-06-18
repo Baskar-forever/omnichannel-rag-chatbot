@@ -66,3 +66,37 @@ class SessionRepository:
         db.refresh(session)
 
         return session
+    
+    def get_by_phone_number(
+        self,
+        db,
+        phone_number: str
+    ):
+
+        return (
+            db.query(ChatSession)
+            .filter(
+                ChatSession.phone_number
+                == phone_number
+            )
+            .first()
+        )
+    
+    def create_whatsapp_session(
+        self,
+        db,
+        phone_number: str
+    ):
+
+        session = ChatSession(
+            phone_number=phone_number,
+            state="ASK_NAME"
+        )
+
+        db.add(session)
+
+        db.commit()
+
+        db.refresh(session)
+
+        return session

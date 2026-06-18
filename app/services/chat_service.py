@@ -314,16 +314,45 @@ class ChatService:
                     url
                 )
 
+                page_name = (
+                    url.split("/")[-1]
+                )
+
+                if page_name in [
+                    "",
+                    "index.php"
+                ]:
+
+                    page_name = "Home"
+
+                else:
+
+                    page_name = (
+                        page_name
+                        .replace(".php", "")
+                        .replace("-", " ")
+                        .title()
+                    )
+
                 sources.append(
                     {
-                        "title": chunk.get(
-                            "title",
-                            ""
-                        ),
-                        "url": url
+                        "title": page_name,
+                        "url": url,
+                        "score": chunk.get(
+                            "score",
+                            0
+                        )
                     }
                 )
 
+            # sort by retrieval score
+            sources.sort(
+                key=lambda x: x["score"],
+                reverse=True
+            )
+
+            # only top 3
+            sources = sources[:3]
             return {
                 "reply": answer,
                 "state": "READY",

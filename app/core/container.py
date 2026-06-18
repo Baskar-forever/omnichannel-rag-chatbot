@@ -50,6 +50,9 @@ from app.services.chat_service import (
     ChatService
 )
 
+from app.services.whatsapp_service import (
+    WhatsAppService
+)
 
 class ServiceContainer:
 
@@ -179,6 +182,16 @@ class ServiceContainer:
                     MessageRepository()
             )
         )
+
+        self.whatsapp_service = (
+        WhatsAppService(
+        chat_service=
+        self.chat_service,
+        session_repository=
+        SessionRepository()
+            )
+        )
+
 
 
 container = ServiceContainer()
