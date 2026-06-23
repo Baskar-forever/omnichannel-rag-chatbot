@@ -1,110 +1,155 @@
 # Omnichannel RAG Chatbot
 
-## Overview
+An AI-powered customer support and lead generation platform that provides a unified conversational experience across Website and WhatsApp channels using a shared Retrieval-Augmented Generation (RAG) knowledge base.
 
-Omnichannel RAG Chatbot is an AI-powered customer support and lead generation platform that provides a unified experience across both Website and WhatsApp channels.
+## Problem
 
-The system uses a shared knowledge base, collects customer enquiries, stores leads, and answers questions using company information, FAQs, website content, and uploaded documents.
+Many businesses need AI assistants across multiple channels, but maintaining separate knowledge bases for Website Chat, WhatsApp, and other platforms creates duplication, inconsistency, and operational overhead.
 
-Designed to be reusable across organizations by simply changing the knowledge source, prompts, and configuration.
+This project solves that problem by providing:
+
+* A shared knowledge base
+* Unified retrieval architecture
+* Lead collection workflow
+* Multi-channel support
+* Source attribution
+* Local LLM inference
+
+## Key Features
+
+### Multi-Channel Support
+
+* Website Chatbot
+* WhatsApp Cloud API Integration
+
+Both channels share:
+
+* Retrieval pipeline
+* Knowledge base
+* Lead database
+* Session management
 
 ---
 
-## Screenshots
+### Lead Collection
 
-### Website Chatbot
+Collects and stores:
 
-Demonstrates lead collection, knowledge retrieval, source attribution, and AI-powered responses.
+* Name
+* Email
+* Phone Number
 
-![Website Chatbot](screenshots/website-chatbot.png)
-
----
-
-### WhatsApp Chatbot
-
-Demonstrates customer interaction through WhatsApp using the same shared knowledge base.
-
-![WhatsApp Chatbot](screenshots/whatsapp-chatbot.png)
+All lead information is persisted in PostgreSQL for future follow-up and analytics.
 
 ---
 
-## Features
+### Retrieval-Augmented Generation (RAG)
 
-### Website Chatbot
+The system retrieves relevant information before generating responses.
 
-* Collects customer Name, Email, and Phone Number
-* Stores lead information in PostgreSQL
-* Answers questions using company knowledge
-* Maintains conversation history
-* Displays source references used for responses
+Knowledge sources can include:
 
-### WhatsApp Chatbot
+* Website content
+* FAQs
+* Documentation
+* PDFs
+* Internal knowledge bases
 
-* Uses the same knowledge base as the website chatbot
-* Collects customer information through WhatsApp conversations
-* Stores customer leads and chat history
-* Automatically answers company and service-related questions
-* Prevents duplicate message processing
+---
 
-### Shared Knowledge Base
+### Hybrid Retrieval Pipeline
 
-* Website content ingestion
-* FAQ ingestion
-* PDF and document ingestion
-* Qdrant vector search
-* Hybrid retrieval architecture
-* Cross-encoder reranking
+The retrieval pipeline is designed to optimize both Recall and Precision.
+
+#### Stage 1: Dense Retrieval
+
+Uses:
+
+* BAAI BGE Embeddings
+* Qdrant Vector Database
+
+Purpose:
+
+* Semantic search
+* Meaning-based matching
+
+#### Stage 2: BM25 Retrieval
+
+Purpose:
+
+* Exact keyword matching
+* Acronyms
+* Product names
+* Domain-specific terminology
+
+#### Stage 3: Reciprocal Rank Fusion (RRF)
+
+Combines Dense Retrieval and BM25 results.
+
+Purpose:
+
+* Improve Recall
+* Reduce retrieval blind spots
+
+#### Stage 4: CrossEncoder Reranking
+
+Uses:
+
+* MS MARCO CrossEncoder
+
+Purpose:
+
+* Improve Precision
+* Select the most relevant chunks before generation
+
+### Retrieval Philosophy
+
+Recall First
+
+Retrieve enough potentially relevant information.
+
+Precision Second
+
+Use reranking to remove noise before sending context to the LLM.
 
 ---
 
 ## Architecture
 
+```text
 User
-↓
-Website Chat / WhatsApp Chat
-↓
+│
+├── Website Chat
+│
+└── WhatsApp
+        │
+        ▼
 FastAPI Backend
-↓
-Lead Collection & Session Management
-↓
-Hybrid Retrieval Pipeline
+        │
+        ▼
+Lead Collection
+Session Management
+        │
+        ▼
+Hybrid Retrieval
 
-* Dense Retrieval (BGE Embeddings + Qdrant)
-* BM25 Keyword Retrieval
-* Reciprocal Rank Fusion (RRF)
-* CrossEncoder Reranker
+├── Dense Search (Qdrant)
+├── BM25 Search
+└── Rank Fusion
 
-↓
+        │
+        ▼
+CrossEncoder Reranker
+        │
+        ▼
 Llama 3.2
-↓
+        │
+        ▼
 Response Generation
-
----
-
-## Retrieval Strategy
-
-The project focuses on improving both Recall and Precision.
-
-### Recall Improvements
-
-* Dense Vector Retrieval
-* BM25 Keyword Retrieval
-* Reciprocal Rank Fusion (RRF)
-
-These stages maximize the chances of retrieving all relevant information.
-
-### Precision Improvements
-
-* CrossEncoder Reranker
-
-The reranker re-scores retrieved chunks and selects the most relevant context before passing it to the LLM.
-
-In simple terms:
-
-* High Recall → Don't miss important information.
-* High Precision → Don't send irrelevant information to the model.
-
----
+        │
+        ▼
+PostgreSQL Storage
+```
 
 ## Technology Stack
 
@@ -123,10 +168,10 @@ In simple terms:
 
 ### AI Components
 
-* Local Llama 3.2
+* Llama 3.2
 * BAAI BGE Embeddings
 * BM25 Retrieval
-* Reciprocal Rank Fusion (RRF)
+* Reciprocal Rank Fusion
 * CrossEncoder Reranker
 
 ### Messaging
@@ -140,6 +185,18 @@ In simple terms:
 
 ---
 
+## Screenshots
+
+### Website Chatbot
+
+![Website Chatbot](screenshots/website-chatbot.png)
+
+### WhatsApp Chatbot
+
+![WhatsApp Chatbot](screenshots/whatsapp-chatbot.png)
+
+---
+
 ## Project Structure
 
 ```text
@@ -150,11 +207,13 @@ app/
 ├── models/
 ├── prompts/
 ├── providers/
+│   ├── embeddings/
+│   ├── llm/
+│   └── rerankers/
 ├── rag/
 ├── repositories/
 ├── schemas/
 ├── services/
-├── utils/
 └── main.py
 
 scripts/
@@ -163,26 +222,21 @@ scripts/
 ├── test_hybrid_rerank.py
 ├── test_rank_fusion.py
 └── test_whatsapp.py
-
-screenshots/
-├── website-chatbot.png
-└── whatsapp-chatbot.png
 ```
-
----
 
 ## Setup
 
 ### Clone Repository
 
+```bash
 git clone https://github.com/Baskar-forever/omnichannel-rag-chatbot.git
 
 cd omnichannel-rag-chatbot
+```
 
-### Environment Variables
+### Configure Environment Variables
 
-Create a .env file and configure:
-
+```env
 DATABASE_URL=
 
 QDRANT_HOST=
@@ -192,57 +246,75 @@ WHATSAPP_ACCESS_TOKEN=
 WHATSAPP_PHONE_ID=
 
 LLM_MODEL=
+```
 
 ### Start Services
 
+```bash
 docker compose up -d
+```
 
 ### Initialize Database
 
+```bash
 python init_db.py
+```
 
 ### Run Application
 
+```bash
 uvicorn app.main:app --reload
+```
 
 ---
 
-## WhatsApp Configuration
+## WhatsApp Integration
 
-1. Create a Meta Developer App
-2. Configure WhatsApp Cloud API
-3. Configure the Webhook URL
-4. Set a Verify Token
-5. Add Access Token and Phone Number ID to the .env file
+1. Create Meta Developer App
+2. Enable WhatsApp Cloud API
+3. Configure Webhook URL
+4. Configure Verify Token
+5. Add Access Token and Phone Number ID
 
 Webhook Endpoint:
 
+```text
 /api/whatsapp/webhook
+```
 
 ---
 
-## Deliverables
+## Reliability Features
 
-* Website AI Chatbot
-* WhatsApp AI Chatbot
-* Shared Knowledge Base
-* Lead Collection System
-* PostgreSQL Storage
-* Source Attribution
-* Docker Deployment
-* Documentation
+### WhatsApp Message Deduplication
 
----
+Stores processed WhatsApp Message IDs to prevent duplicate responses caused by webhook retries.
 
-## Notes
+### Session Persistence
 
-* Shared knowledge base used by both Website and WhatsApp channels
-* Lead information stored in PostgreSQL
-* Message deduplication implemented for WhatsApp reliability
-* Local Llama model used for response generation
-* Retrieval pipeline optimized for both Recall and Precision
-* Easily adaptable to different organizations by changing the knowledge source and prompts
+Conversation state is stored in PostgreSQL allowing users to continue conversations across requests.
+
+### Source Attribution
+
+Responses include source references used during retrieval.
 
 ---
 
-Originally developed as a technical assessment project and later generalized into a reusable omnichannel RAG chatbot framework.
+## Future Improvements
+
+* Evaluation Pipeline
+* Retrieval Metrics Dashboard
+* Automated Knowledge Base Updates
+* Conversation Analytics
+* Multi-Tenant Support
+* Additional Communication Channels
+
+---
+
+## License
+
+MIT License
+
+---
+
+Originally developed as a technical assessment and later generalized into a reusable Omnichannel RAG Chatbot framework.
