@@ -175,7 +175,7 @@ screenshots/
 
 ### Clone Repository
 
-git clone <repository-url>
+git clone https://github.com/Baskar-forever/omnichannel-rag-chatbot.git
 
 cd omnichannel-rag-chatbot
 
